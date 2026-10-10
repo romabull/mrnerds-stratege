@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Стратегия: Европа 1936</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-container {
+            background: rgba(30, 30, 60, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid #2d3748;
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #a0aec0;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            color: #a0aec0;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            background: #0f0f1e;
+            color: #e2e8f0;
+            border: 2px solid #2d3748;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-secondary {
+            background: #4a5568;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #2d3748;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 30px 0 20px;
+            color: #4a5568;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #2d3748;
+        }
+        .error {
+            color: #fc8181;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .error.show { display: block; }
+        .admin-result {
+            color: #68d391;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+        .admin-result.show { display: block; }
+        .admin-result.error {
+            color: #fc8181;
+            background: rgba(220, 38, 38, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>🎮 Стратегия: Европа 1936</h1>
+        <p class="subtitle">Введите ник чтобы играть</p>
+
+        <div id="authError" class="error"></div>
+
+        <div class="form-group">
+            <label for="usernameInput">Ваш ник</label>
+            <input type="text" id="usernameInput" placeholder="Например: Наполеон" maxlength="24" autocomplete="off">
+        </div>
+
+        <button id="playBtn" class="btn btn-primary" disabled>▶ Играть</button>
+
+        <div class="divider">Админка</div>
+
+        <div class="form-group">
+            <label for="adminUser">Имя админа</label>
+            <input type="text" id="adminUser" placeholder="admin" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="adminPass">Пароль админа</label>
+            <input type="password" id="adminPass" placeholder="••••••••" autocomplete="off">
+        </div>
+
+        <button id="clearRoomsBtn" class="btn btn-danger">🗑️ Очистить все комнаты</button>
+
+        <div id="adminResult" class="admin-result"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  🔐 ПРОСТАЯ СТРАНИЦА ВХОДА
+        // ============================================================
+
+        const usernameInput = document.getElementById('usernameInput');
+        const playBtn = document.getElementById('playBtn');
+        const authError = document.getElementById('authError');
+
+        const adminUser = document.getElementById('adminUser');
+        const adminPass = document.getElementById('adminPass');
+        const clearRoomsBtn = document.getElementById('clearRoomsBtn');
+        const adminResult = document.getElementById('adminResult');
+
+        // Запоминаем ник
+        const savedName = localStorage.getItem('username');
+        if (savedName) {
+            usernameInput.value = savedName;
+            playBtn.disabled = false;
+        }
+
+        usernameInput.addEventListener('input', () => {
+            const v = usernameInput.value.trim();
+            playBtn.disabled = v.length < 2;
+            authError.classList.remove('show');
+        });
+
+        usernameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !playBtn.disabled) playBtn.click();
+        });
+
+       playBtn.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    if (username.length < 2) return showError('Ник минимум 2 символа');
+    if (username.length > 24) return showError('Ник слишком длинный');
+    if (!/^[a-zA-Z0-9_\-\.]+$/.test(username)) {
+        return showError('Только латиница (A-Z), цифры, _ - . — без пробелов и кириллицы');
+    }
+    localStorage.setItem('username', username);
+    window.location.href = '/game.html';
+});
+        function showError(msg) {
+            authError.textContent = msg;
+            authError.classList.add('show');
+        }
+
+        // ============ АДМИНКА ============
+        clearRoomsBtn.addEventListener('click', async () => {
+            const u = adminUser.value.trim();
+            const p = adminPass.value;
+
+            if (!u || !p) {
+                showAdminResult('Введите имя админа и пароль', true);
+                return;
+            }
+
+            clearRoomsBtn.disabled = true;
+            clearRoomsBtn.textContent = '⏳ Очистка...';
+
+            try {
+                const res = await fetch('/api/admin/clear-rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok) {
+                    showAdminResult(`✅ Удалено комнат: ${data.cleared || 0}`, false);
+                } else {
+                    showAdminResult(`❌ ${data.error || 'Ошибка (статус ' + res.status + ')'}`, true);
+                }
+            } catch (e) {
+                showAdminResult('❌ Нет соединения с сервером', true);
+            } finally {
+                clearRoomsBtn.disabled = false;
+                clearRoomsBtn.textContent = '🗑️ Очистить все комнаты';
+            }
+        });
+
+        function showAdminResult(msg, isError) {
+            adminResult.textContent = msg;
+            adminResult.classList.add('show');
+            adminResult.classList.toggle('error', !!isError);
+            setTimeout(() => {
+                adminResult.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

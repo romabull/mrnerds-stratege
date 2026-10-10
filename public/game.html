@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Стратегия: Европа 1936</title>
+    <link rel="stylesheet" href="game.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+    <div id="gameApp">
+        <!-- Экран лобби -->
+        <div id="lobbyView" class="game-container">
+            <header class="game-header">
+                <h1>🎮 Стратегия: Европа 1936</h1>
+                <a href="/" class="btn-back">← На главную</a>
+            </header>
+
+            <div class="lobby-box">
+                <h2>Комнаты</h2>
+                <div class="lobby-actions">
+                    <button id="createRoomBtn" class="btn-primary">+ Создать комнату</button>
+                    <button id="refreshRoomsBtn" class="btn-secondary">🔄 Обновить</button>
+                </div>
+                <div id="roomsList" class="rooms-list">
+                    <p class="empty">Загрузка комнат...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран комнаты -->
+        <div id="roomView" class="game-container" style="display: none;">
+            <header class="game-header">
+                <h1 id="roomTitle">🎮 Комната</h1>
+                <button id="leaveRoomBtn" class="btn-back">← Выйти</button>
+            </header>
+
+            <div class="room-info">
+                <div id="roomPlayers" class="players-list"></div>
+                <div id="roomStatus" class="room-status">Ожидание игроков...</div>
+                <div id="countryPickerContainer"></div>
+                <button id="startGameBtn" class="btn-primary" disabled style="margin-top: 15px;">▶ Начать игру</button>
+            </div>
+        </div>
+
+        <!-- Экран карты -->
+        <div id="mapView" class="game-container" style="display: none;">
+            <header class="game-header">
+                <h1 id="mapTitle">🗺️ Европа 1936</h1>
+                <div class="map-controls">
+                    <span id="turnInfo">Ход 1</span>
+                    <span id="currentPlayerInfo"></span>
+                    <button id="openDiplomacyBtn" class="btn-secondary" style="padding: 8px 16px;">🕊️ Дипломатия</button>
+                    <button id="openMarketBtn" class="btn-secondary" style="padding: 8px 16px;">💰 Рынок</button>
+                    <button id="openEconomyBtn" class="btn-secondary" style="padding: 8px 16px;">🏭 Экономика</button>
+                    <button id="endTurnBtn" class="btn-primary">Завершить ход</button>
+                </div>
+            </header>
+
+            <div id="resourcesBar" style="display:flex; gap:15px; padding:10px 15px; background:rgba(15,15,30,0.8); border-radius:12px; margin-bottom:15px; font-size:14px; flex-wrap:wrap;"></div>
+
+            <div class="map-legend" id="mapLegend"></div>
+
+            <div class="map-wrapper">
+                <div id="mapContainer" style="position: relative;">
+                    <div id="mapControls" style="position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; z-index: 100;">
+                        <button id="panModeBtn" class="map-ctrl-btn" title="Рука (H)">✋</button>
+                        <button id="zoomInBtn" class="map-ctrl-btn" title="Приблизить">+</button>
+                        <button id="zoomOutBtn" class="map-ctrl-btn" title="Отдалить">−</button>
+                        <button id="zoomResetBtn" class="map-ctrl-btn" title="Сброс">⌂</button>
+                    </div>
+                </div>
+                <aside id="provinceInfo" class="province-info">
+                    <h3>Информация</h3>
+                    <p class="empty">Кликни по провинции</p>
+                </aside>
+            </div>
+
+            <div id="eventLog" class="event-log"></div>
+        </div>
+    </div>
+     <script src="population-data.js"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game-map.js"></script>
+    <script src="game-events.js"></script>
+    <script src="game-state.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
