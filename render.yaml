@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: physics-strategy
+    env: node
+    plan: free
+    region: frankfurt
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PLATFORM_URL
+        value: https://mrnerd.vercel.app
+    healthCheckPath: /api/ping
